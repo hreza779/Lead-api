@@ -6,12 +6,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: development
+      target: production  # تغییر به پروداکشن
+    image: lead_app_image
     container_name: lead_app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
-      - .:/var/www/html
+      # فقط پوشه‌هایی که تغییر می‌کنند را مانت می‌کنیم
+      - ./storage:/var/www/html/storage
       - ./docker/php/php.ini:/usr/local/etc/php/conf.d/custom.ini
     networks:
       - lead_network
@@ -19,18 +21,25 @@ services:
       - mysql
       - redis
     environment:
-      - APP_ENV=${APP_ENV:-local}
-      - APP_DEBUG=${APP_DEBUG:-true}
+      APP_ENV: production
+      APP_DEBUG: 'false'
 
-  # Nginx Web Server
+  # Nginx (Internal Web Server)
+  # این وب‌سرور داخلی است که فایل‌های استاتیک و PHP را مدیریت می‌کند
   nginx:
     image: nginx:alpine
     container_name: lead_nginx
     restart: unless-stopped
     ports:
-      - "8000:80"
+      - "8000:80" # این پورت را در Nginx اصلی سرور صدا می‌زنیم
     volumes:
-      - .:/var/www/html
+      # در اینجا نیاز داریم فایل‌های پابلیک را به انجین‌اکس بدهیم
+      # اما چون کدها در والیوم نیستند، از volumes_from یا کپی استفاده میکنیم.
+      # ساده‌ترین راه: مانت کردن public اگر بیلد استاتیک ندارید،
+      # یا بهتر: استفاده از والیوم اشتراکی بین app و nginx.
+      # در اینجا برای سادگی، فرض میکنیم کانتینر app فایل‌ها را دارد.
+      # راه حل صحیح داکر برای پروداکشن:
+      - ./public:/var/www/html/public # فقط پوشه پابلیک برای دسترسی به استتیک‌ها
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     networks:
       - lead_network
@@ -42,8 +51,7 @@ services:
     image: mysql:8.0
     container_name: lead_mysql
     restart: unless-stopped
-    ports:
-      - "3306:3306"
+    # پورت‌ها را حذف کردیم تا از بیرون سرور قابل دسترسی نباشد (امنیت)
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-lead}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
@@ -60,24 +68,12 @@ services:
     image: redis:alpine
     container_name: lead_redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    # پورت‌ها را حذف کردیم (امنیت)
     volumes:
       - redis_data:/data
     networks:
       - lead_network
     command: redis-server --appendonly yes
-
-  # Mailhog (Email Testing)
-  mailhog:
-    image: mailhog/mailhog
-    container_name: lead_mailhog
-    restart: unless-stopped
-    ports:
-      - "1025:1025" # SMTP port
-      - "8025:8025" # Web UI
-    networks:
-      - lead_network
 
 networks:
   lead_network:
