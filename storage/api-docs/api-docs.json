@@ -1,0 +1,3851 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "مستندات API سامانه لد ",
+        "description": "توضیحات نحوه استفاده از APIها",
+        "contact": {
+            "email": "hreza779@gmail.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000/",
+            "description": "سرور اصلی API"
+        }
+    ],
+    "paths": {
+        "/api/auth/send-otp": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Send OTP Code",
+                "operationId": "bffceebe22269794653d542fb5e548dd",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "phone"
+                                ],
+                                "properties": {
+                                    "phone": {
+                                        "description": "شماره موبایل کاربر",
+                                        "type": "string",
+                                        "example": "09123456789"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP Sent Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "کد تایید ارسال شد"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "expires_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "code": {
+                                                    "description": "Only in dev mode",
+                                                    "type": "string",
+                                                    "example": "1234"
+                                                },
+                                                "is_registered": {
+                                                    "description": "آیا کاربر قبلا ثبت نام کرده است",
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "شماره موبایل معتبر نیست"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تعداد درخواست‌های شما بیش از حد مجاز است"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/verify-otp": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Verify OTP and Login/Register",
+                "operationId": "abcb5741589707b15c7ecac7a67c13aa",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "phone",
+                                    "code"
+                                ],
+                                "properties": {
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "09123456789"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "1234"
+                                    },
+                                    "data": {
+                                        "description": "اطلاعات تکمیلی برای ثبت نام (به صورت آرایه ارسال شود: data[name], data[avatar])",
+                                        "properties": {
+                                            "name": {
+                                                "description": "نام کاربر (اختیاری) - ارسال به صورت: data[name]",
+                                                "type": "string",
+                                                "example": "Ali Rezaei"
+                                            },
+                                            "avatar": {
+                                                "description": "تصویر پروفایل (اختیاری) - ارسال به صورت: data[avatar]",
+                                                "type": "string",
+                                                "format": "binary"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "ورود موفقیت‌آمیز"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "type": "object"
+                                                },
+                                                "token": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid OTP",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "کد تایید نامعتبر یا منقضی شده است"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    }
+                }
+            }
+        },
+        "/api/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout User",
+                "operationId": "df9bdc6c7a6d9f20b983526b2ec0f698",
+                "responses": {
+                    "200": {
+                        "description": "Logout Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "خروج موفقیت‌آمیز"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/assessments": {
+            "get": {
+                "tags": [
+                    "Assessments"
+                ],
+                "summary": "Get all assessments",
+                "operationId": "85e6069ea97d0a0503b85242e0b3dea9",
+                "parameters": [
+                    {
+                        "name": "manager_id",
+                        "in": "query",
+                        "description": "Filter by manager ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "submitted"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of assessments"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Assessments"
+                ],
+                "summary": "Start a new assessment for a manager",
+                "operationId": "c3531e342c778287360c8149bab5bfb9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "manager_id",
+                                    "template_id"
+                                ],
+                                "properties": {
+                                    "manager_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "template_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Assessment started successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/assessments/{assessment}": {
+            "get": {
+                "tags": [
+                    "Assessments"
+                ],
+                "summary": "Get a specific assessment",
+                "operationId": "bd42f1da5389470b3a410d511b4a6bc6",
+                "parameters": [
+                    {
+                        "name": "assessment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Assessment details"
+                    },
+                    "404": {
+                        "description": "Assessment not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Assessments"
+                ],
+                "summary": "Update assessment (save progress)",
+                "operationId": "e8fc6a8ea22f69889a6d99d837283762",
+                "parameters": [
+                    {
+                        "name": "assessment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "current_step": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "answers": {
+                                        "type": "object",
+                                        "example": {
+                                            "1": "Remote",
+                                            "2": "5 years"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Assessment updated successfully"
+                    },
+                    "404": {
+                        "description": "Assessment not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Assessments"
+                ],
+                "summary": "Delete an assessment",
+                "operationId": "0ea40b7be65837e05689d55b7603f5de",
+                "parameters": [
+                    {
+                        "name": "assessment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Assessment deleted successfully"
+                    },
+                    "404": {
+                        "description": "Assessment not found"
+                    },
+                    "403": {
+                        "description": "Cannot delete submitted assessment"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/assessments/{assessment}/submit": {
+            "post": {
+                "tags": [
+                    "Assessments"
+                ],
+                "summary": "Submit final assessment",
+                "operationId": "dacfff5ff488f011d061376a4db01a8f",
+                "parameters": [
+                    {
+                        "name": "assessment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "answers"
+                                ],
+                                "properties": {
+                                    "answers": {
+                                        "type": "object",
+                                        "example": {
+                                            "1": "Remote",
+                                            "2": "5 years",
+                                            "3": "Yes"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Assessment submitted successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/assessment-questions": {
+            "get": {
+                "tags": [
+                    "Assessment Questions"
+                ],
+                "summary": "Get all assessment questions",
+                "operationId": "f279c69593150014f714894cdb26804c",
+                "parameters": [
+                    {
+                        "name": "step_id",
+                        "in": "query",
+                        "description": "Filter by step ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of assessment questions"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Assessment Questions"
+                ],
+                "summary": "Create a new assessment question",
+                "operationId": "6edfcb44a297dce81fbf9ab0ec49d977",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "step_id",
+                                    "question",
+                                    "type",
+                                    "order"
+                                ],
+                                "properties": {
+                                    "step_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "question": {
+                                        "type": "string",
+                                        "example": "What is your preferred work style?"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "text",
+                                            "select",
+                                            "radio",
+                                            "checkbox",
+                                            "rating"
+                                        ],
+                                        "example": "select"
+                                    },
+                                    "options": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "Remote",
+                                            "Hybrid",
+                                            "Office"
+                                        ]
+                                    },
+                                    "required": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "order": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Question created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/assessment-questions/{question}": {
+            "get": {
+                "tags": [
+                    "Assessment Questions"
+                ],
+                "summary": "Get a specific assessment question",
+                "operationId": "bdc1c68729c588da3cd7397c784eb6af",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Question details"
+                    },
+                    "404": {
+                        "description": "Question not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Assessment Questions"
+                ],
+                "summary": "Update an assessment question",
+                "operationId": "b93080ad91ec22580134ef3f0743615c",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "question": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "text",
+                                            "select",
+                                            "radio",
+                                            "checkbox",
+                                            "rating"
+                                        ]
+                                    },
+                                    "options": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": {
+                                        "type": "boolean"
+                                    },
+                                    "order": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Question updated successfully"
+                    },
+                    "404": {
+                        "description": "Question not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Assessment Questions"
+                ],
+                "summary": "Delete an assessment question",
+                "operationId": "916a2fa159164ca6f688bda8077e9fd2",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Question deleted successfully"
+                    },
+                    "404": {
+                        "description": "Question not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/assessment-questions/{question}/reorder": {
+            "put": {
+                "tags": [
+                    "Assessment Questions"
+                ],
+                "summary": "Update question order",
+                "operationId": "7b0216949e40e005476fe5f205dbaca6",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "order"
+                                ],
+                                "properties": {
+                                    "order": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Order updated successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/assessment-steps": {
+            "get": {
+                "tags": [
+                    "Assessment Steps"
+                ],
+                "summary": "Get all assessment steps",
+                "operationId": "6922181810bcd2751b92710f8c8dfc86",
+                "parameters": [
+                    {
+                        "name": "template_id",
+                        "in": "query",
+                        "description": "Filter by template ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of assessment steps"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Assessment Steps"
+                ],
+                "summary": "Create a new assessment step",
+                "operationId": "9293e8a95216513e169a837feaf5b777",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "template_id",
+                                    "title",
+                                    "order"
+                                ],
+                                "properties": {
+                                    "template_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Personal Information"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Basic personal details"
+                                    },
+                                    "order": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Step created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/assessment-steps/{step}": {
+            "get": {
+                "tags": [
+                    "Assessment Steps"
+                ],
+                "summary": "Get a specific assessment step",
+                "operationId": "bc4248e4eddcb16ac24356903ad23bf6",
+                "parameters": [
+                    {
+                        "name": "step",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Step details"
+                    },
+                    "404": {
+                        "description": "Step not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Assessment Steps"
+                ],
+                "summary": "Update an assessment step",
+                "operationId": "afb9488dd059689f380185089aced70e",
+                "parameters": [
+                    {
+                        "name": "step",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "order": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Step updated successfully"
+                    },
+                    "404": {
+                        "description": "Step not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Assessment Steps"
+                ],
+                "summary": "Delete an assessment step",
+                "operationId": "3c2f19dd123e0ddb363ffbe3a1dcfd6d",
+                "parameters": [
+                    {
+                        "name": "step",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Step deleted successfully"
+                    },
+                    "404": {
+                        "description": "Step not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/assessment-steps/{step}/reorder": {
+            "put": {
+                "tags": [
+                    "Assessment Steps"
+                ],
+                "summary": "Update step order",
+                "operationId": "eb83c2e0c50ed63aee8dc377a678daef",
+                "parameters": [
+                    {
+                        "name": "step",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "order"
+                                ],
+                                "properties": {
+                                    "order": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Order updated successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/assessment-templates": {
+            "get": {
+                "tags": [
+                    "Assessment Templates"
+                ],
+                "summary": "Get all assessment templates",
+                "operationId": "212507926d4eaf4b8c5444c15052e82d",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "draft",
+                                "archived"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "Filter by category",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of assessment templates"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Assessment Templates"
+                ],
+                "summary": "Create a new assessment template",
+                "operationId": "8fe3e1a793c031d23edacac8dadc37b0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "category",
+                                    "estimated_time"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Employee Onboarding"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Initial assessment for new employees"
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "HR"
+                                    },
+                                    "estimated_time": {
+                                        "type": "integer",
+                                        "example": 30
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "draft",
+                                            "archived"
+                                        ],
+                                        "example": "draft"
+                                    },
+                                    "steps": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "order": {
+                                                    "type": "integer"
+                                                },
+                                                "questions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "question": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "text",
+                                                                    "select",
+                                                                    "radio",
+                                                                    "checkbox",
+                                                                    "rating"
+                                                                ]
+                                                            },
+                                                            "options": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "order": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Template created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/assessment-templates/{template}": {
+            "get": {
+                "tags": [
+                    "Assessment Templates"
+                ],
+                "summary": "Get a specific assessment template",
+                "operationId": "5474030e9613463a7f053f4d1cb3a194",
+                "parameters": [
+                    {
+                        "name": "template",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Template details"
+                    },
+                    "404": {
+                        "description": "Template not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Assessment Templates"
+                ],
+                "summary": "Update an assessment template",
+                "operationId": "90ee1da4e51f7aa9d182bd84fc0f2cf7",
+                "parameters": [
+                    {
+                        "name": "template",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "category": {
+                                        "type": "string"
+                                    },
+                                    "estimated_time": {
+                                        "type": "integer"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "draft",
+                                            "archived"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Template updated successfully"
+                    },
+                    "404": {
+                        "description": "Template not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Assessment Templates"
+                ],
+                "summary": "Delete an assessment template",
+                "operationId": "ef8e2900bba64828dd5cb9dabf2cda6a",
+                "parameters": [
+                    {
+                        "name": "template",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Template deleted successfully"
+                    },
+                    "404": {
+                        "description": "Template not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/companies": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Get all companies",
+                "operationId": "54f966c056050f9db4fff6ee5a45a76a",
+                "parameters": [
+                    {
+                        "name": "owner_id",
+                        "in": "query",
+                        "description": "Filter by owner ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of companies"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Create a new company",
+                "operationId": "00e2db7b0f71c32b377f4dfc4dd685a8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "manager_name",
+                                    "manager_phone"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Acme Corp"
+                                    },
+                                    "legal_name": {
+                                        "type": "string",
+                                        "example": "Acme Corporation Ltd"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "02188888888"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "info@acme.com"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Tehran, Vanak Sq."
+                                    },
+                                    "website": {
+                                        "type": "string",
+                                        "example": "https://acme.com"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Best company ever"
+                                    },
+                                    "manager_name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "manager_phone": {
+                                        "type": "string",
+                                        "example": "09123456789"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Company created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/companies/my-companies": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Get companies associated with logged-in user (Owner or Manager)",
+                "operationId": "f1736d85d8a3d4dc2c1182d80ebd7dbe",
+                "responses": {
+                    "200": {
+                        "description": "List of user's companies"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/companies/{company}": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Get company details",
+                "operationId": "dbcfdfb0281353ca1b00a67c0b0c2308",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Company details"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Update company",
+                "operationId": "17ee846405381b70d408b7532b44601a",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Company updated successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Delete company",
+                "operationId": "815006ac9bb0fb97b1cad53b1a620652",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Company deleted successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exams": {
+            "get": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Get all exams",
+                "operationId": "a54e05ebd2b23c9f2329a2a483272bc3",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "draft",
+                                "archived"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of exams"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Create a new exam",
+                "operationId": "fa2de658c3313746441306155597563e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "duration",
+                                    "passing_score"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Math Exam"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Basic math questions"
+                                    },
+                                    "duration": {
+                                        "type": "integer",
+                                        "example": 60
+                                    },
+                                    "passing_score": {
+                                        "type": "integer",
+                                        "example": 70
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "draft",
+                                            "archived"
+                                        ],
+                                        "example": "draft"
+                                    },
+                                    "question_ids": {
+                                        "description": "Array of question IDs to attach",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2,
+                                            3
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Exam created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exams/{exam}": {
+            "get": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Get a specific exam",
+                "operationId": "112c80bb353c3bb00ddf36a06ea617cf",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam details"
+                    },
+                    "404": {
+                        "description": "Exam not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Update an exam",
+                "operationId": "ff1b5cc2782780e37965d541920e15cd",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "duration": {
+                                        "type": "integer"
+                                    },
+                                    "passing_score": {
+                                        "type": "integer"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "draft",
+                                            "archived"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Exam updated successfully"
+                    },
+                    "404": {
+                        "description": "Exam not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Delete an exam",
+                "operationId": "2749cce3d76ee23f433dc1ae5cc2bce0",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Exam deleted successfully"
+                    },
+                    "404": {
+                        "description": "Exam not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exams/{exam}/questions": {
+            "post": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Attach questions to exam",
+                "operationId": "ce7741760a7ea5302ae889ec411ff4f5",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "questions"
+                                ],
+                                "properties": {
+                                    "questions": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "question_id": {
+                                                    "type": "integer"
+                                                },
+                                                "order": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "question_id": 1,
+                                                "order": 1
+                                            },
+                                            {
+                                                "question_id": 2,
+                                                "order": 2
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Questions attached successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exams/{exam}/questions/{question}": {
+            "delete": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Detach question from exam",
+                "operationId": "eb8c172e1bdb14255177f0a4fc0ab0a9",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Question detached successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exam-assignments": {
+            "get": {
+                "tags": [
+                    "Exam Assignments"
+                ],
+                "summary": "Get all exam assignments",
+                "operationId": "282335bc3e829ff51884dc79c5c193cf",
+                "parameters": [
+                    {
+                        "name": "exam_id",
+                        "in": "query",
+                        "description": "Filter by exam ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "manager_id",
+                        "in": "query",
+                        "description": "Filter by manager ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "assigned",
+                                "started",
+                                "completed",
+                                "expired"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of exam assignments"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Exam Assignments"
+                ],
+                "summary": "Assign exam to manager(s)",
+                "operationId": "031983dc0be420569e862153df6f1d61",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "exam_id",
+                                    "manager_ids"
+                                ],
+                                "properties": {
+                                    "exam_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "manager_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2,
+                                            3
+                                        ]
+                                    },
+                                    "due_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-02-01"
+                                    },
+                                    "max_attempts": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Exam assigned successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exam-assignments/{assignment}": {
+            "get": {
+                "tags": [
+                    "Exam Assignments"
+                ],
+                "summary": "Get exam assignment details",
+                "operationId": "51c7cf547b74f11635c9a904dda38d2e",
+                "parameters": [
+                    {
+                        "name": "assignment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Assignment details"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Exam Assignments"
+                ],
+                "summary": "Update exam assignment",
+                "operationId": "f1096a593cacc129bd5df81a42ebd781",
+                "parameters": [
+                    {
+                        "name": "assignment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "due_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "max_attempts": {
+                                        "type": "integer"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "assigned",
+                                            "started",
+                                            "completed",
+                                            "expired"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Assignment updated successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Exam Assignments"
+                ],
+                "summary": "Delete exam assignment",
+                "operationId": "457a5213a015ae06035a2b5b74f5f817",
+                "parameters": [
+                    {
+                        "name": "assignment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Assignment deleted successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exam-assignments/{assignment}/start": {
+            "post": {
+                "tags": [
+                    "Exam Assignments"
+                ],
+                "summary": "Mark exam as started",
+                "operationId": "154de778a56d91533ff9c84d505e79b4",
+                "parameters": [
+                    {
+                        "name": "assignment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam started"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exam-assignments/{assignment}/complete": {
+            "post": {
+                "tags": [
+                    "Exam Assignments"
+                ],
+                "summary": "Mark exam as completed",
+                "operationId": "28e0eecadb210594bc4ec51955075833",
+                "parameters": [
+                    {
+                        "name": "assignment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam completed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exam-results": {
+            "get": {
+                "tags": [
+                    "Exam Results"
+                ],
+                "summary": "Get all exam results",
+                "operationId": "cef213570cab27d189a06ca0f8a7f9f0",
+                "parameters": [
+                    {
+                        "name": "exam_set_id",
+                        "in": "query",
+                        "description": "Filter by exam set ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "manager_id",
+                        "in": "query",
+                        "description": "Filter by manager ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "in_progress",
+                                "completed",
+                                "passed",
+                                "failed"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of exam results"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Exam Results"
+                ],
+                "summary": "Start an exam (create result record)",
+                "operationId": "124e4e53544154f686050d75262c4658",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "exam_set_id",
+                                    "exam_id",
+                                    "manager_id"
+                                ],
+                                "properties": {
+                                    "exam_set_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "exam_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "manager_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Exam started successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exam-results/{result}": {
+            "get": {
+                "tags": [
+                    "Exam Results"
+                ],
+                "summary": "Get exam result details",
+                "operationId": "5ba25939b12bb0a9edfaa2a49c3fb7ba",
+                "parameters": [
+                    {
+                        "name": "result",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Result details"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Exam Results"
+                ],
+                "summary": "Save answers (in progress)",
+                "operationId": "edfa5eb2265aa3644f3c2e9d9e946adf",
+                "parameters": [
+                    {
+                        "name": "result",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "answers"
+                                ],
+                                "properties": {
+                                    "answers": {
+                                        "type": "object",
+                                        "example": {
+                                            "1": "A",
+                                            "2": "B",
+                                            "3": "C"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Answers saved"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Exam Results"
+                ],
+                "summary": "Delete exam result",
+                "operationId": "61e6db8d04a90e843af23a82525baaee",
+                "parameters": [
+                    {
+                        "name": "result",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Result deleted successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exam-results/{result}/submit": {
+            "post": {
+                "tags": [
+                    "Exam Results"
+                ],
+                "summary": "Submit final answers and calculate score",
+                "operationId": "b47c04cb9960cca5017c2a4a7616c831",
+                "parameters": [
+                    {
+                        "name": "result",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "answers"
+                                ],
+                                "properties": {
+                                    "answers": {
+                                        "type": "object",
+                                        "example": {
+                                            "1": "A",
+                                            "2": "B",
+                                            "3": "C"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Exam submitted successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exam-results/{result}/report": {
+            "get": {
+                "tags": [
+                    "Exam Results"
+                ],
+                "summary": "Get detailed result report",
+                "operationId": "9dc93611e0608b8a34f810398138a18c",
+                "parameters": [
+                    {
+                        "name": "result",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detailed result report"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exam-sets": {
+            "get": {
+                "tags": [
+                    "Exam Sets"
+                ],
+                "summary": "Get all exam sets",
+                "operationId": "0bc0bf34d88c41db9a86f0751e5d4498",
+                "parameters": [
+                    {
+                        "name": "manager_id",
+                        "in": "query",
+                        "description": "Filter by manager ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "in_progress",
+                                "completed"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of exam sets"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Exam Sets"
+                ],
+                "summary": "Create a new exam set",
+                "operationId": "ff08d8ea4390ca06f842576ac7f69066",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "manager_id",
+                                    "title",
+                                    "exam_ids"
+                                ],
+                                "properties": {
+                                    "manager_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "assessment_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Onboarding Exams"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "exam_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2,
+                                            3
+                                        ]
+                                    },
+                                    "assigned_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "exam_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "due_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Exam set created successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exam-sets/{examSet}": {
+            "get": {
+                "tags": [
+                    "Exam Sets"
+                ],
+                "summary": "Get exam set details",
+                "operationId": "00e7c802d79912cda6be473fbb2ee6f9",
+                "parameters": [
+                    {
+                        "name": "examSet",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam set details"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Exam Sets"
+                ],
+                "summary": "Update exam set",
+                "operationId": "556cab365ad5aeb36e4af7e2391ada37",
+                "parameters": [
+                    {
+                        "name": "examSet",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "exam_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "due_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "pending",
+                                            "in_progress",
+                                            "completed"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Exam set updated successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Exam Sets"
+                ],
+                "summary": "Delete exam set",
+                "operationId": "76f0683673ed529f6a1b63f8b5e80185",
+                "parameters": [
+                    {
+                        "name": "examSet",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Exam set deleted successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exam-sets/{examSet}/exams": {
+            "post": {
+                "tags": [
+                    "Exam Sets"
+                ],
+                "summary": "Add exams to exam set",
+                "operationId": "70927492bfd93ddcf4a7d26d9cb4f2c4",
+                "parameters": [
+                    {
+                        "name": "examSet",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "exam_ids"
+                                ],
+                                "properties": {
+                                    "exam_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Exams added successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/managers": {
+            "get": {
+                "tags": [
+                    "Managers"
+                ],
+                "summary": "Get all managers",
+                "operationId": "3c5c8a87ee8f0794b29428fdcd4cae87",
+                "parameters": [
+                    {
+                        "name": "company_id",
+                        "in": "query",
+                        "description": "Filter by company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of managers"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Managers"
+                ],
+                "summary": "Add a manager to a company",
+                "operationId": "81fce48c11db2c663a4ace69b2f69a7c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "company_id",
+                                    "name",
+                                    "phone"
+                                ],
+                                "properties": {
+                                    "company_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Jane Doe"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "09123456789"
+                                    },
+                                    "position": {
+                                        "type": "string",
+                                        "example": "HR Manager"
+                                    },
+                                    "department": {
+                                        "type": "string",
+                                        "example": "Human Resources"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Manager added successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/managers/{manager}": {
+            "get": {
+                "tags": [
+                    "Managers"
+                ],
+                "summary": "Get manager details",
+                "operationId": "80a626aba272384f561f0fdbca50ac92",
+                "parameters": [
+                    {
+                        "name": "manager",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Manager details"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Managers"
+                ],
+                "summary": "Update manager details",
+                "operationId": "d4f0339b8af3fa8856ede4e72299c615",
+                "parameters": [
+                    {
+                        "name": "manager",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "position": {
+                                        "type": "string"
+                                    },
+                                    "department": {
+                                        "type": "string"
+                                    },
+                                    "can_view_results": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Manager updated successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Managers"
+                ],
+                "summary": "Remove manager from company",
+                "operationId": "8b5d50f653284e11c8f886d556c34d83",
+                "parameters": [
+                    {
+                        "name": "manager",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Manager removed successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get user's notifications",
+                "operationId": "911565ad9aff9ba7eded3f189509e578",
+                "parameters": [
+                    {
+                        "name": "is_read",
+                        "in": "query",
+                        "description": "Filter by read status (1 or 0)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of notifications"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Send a manual notification (Admin only)",
+                "operationId": "91f8e779a9e46cb5cdda969e5a928a94",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "title",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Welcome!"
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Welcome to our platform."
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "system"
+                                    },
+                                    "action_url": {
+                                        "type": "string",
+                                        "example": "/dashboard"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Notification sent successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/{notification}/read": {
+            "put": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark notification as read",
+                "operationId": "679a5888e7bc3332a6add3ebc0eafc7a",
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notification marked as read"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/mark-all-read": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark all notifications as read",
+                "operationId": "e1e017838e0e1ed1cd321ccf80869335",
+                "responses": {
+                    "200": {
+                        "description": "All notifications marked as read"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/{notification}": {
+            "delete": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Delete notification",
+                "operationId": "7f078e4ee294fe830b4b842939b15a12",
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Notification deleted successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/questions": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Get all questions",
+                "operationId": "e64d3c7a745fc05662a4a1e1eb3d96ab",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Filter by question type",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "multiple_choice",
+                                "true_false",
+                                "descriptive"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "difficulty",
+                        "in": "query",
+                        "description": "Filter by difficulty",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "easy",
+                                "medium",
+                                "hard"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "Filter by category",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of questions"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Create a new question",
+                "operationId": "788d85763184ddf1b557afb040547f32",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "question",
+                                    "type",
+                                    "correct_answer",
+                                    "score",
+                                    "difficulty",
+                                    "category"
+                                ],
+                                "properties": {
+                                    "question": {
+                                        "type": "string",
+                                        "example": "What is 2+2?"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "multiple_choice",
+                                            "true_false",
+                                            "descriptive"
+                                        ],
+                                        "example": "multiple_choice"
+                                    },
+                                    "options": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "3",
+                                            "4",
+                                            "5"
+                                        ]
+                                    },
+                                    "correct_answer": {
+                                        "type": "string",
+                                        "example": "4"
+                                    },
+                                    "score": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "difficulty": {
+                                        "type": "string",
+                                        "enum": [
+                                            "easy",
+                                            "medium",
+                                            "hard"
+                                        ],
+                                        "example": "easy"
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "Math"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Question created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/questions/{question}": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Get a specific question",
+                "operationId": "8bc2cdefaa6d0469ec03ceb8352077a5",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Question details"
+                    },
+                    "404": {
+                        "description": "Question not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Update a question",
+                "operationId": "cd5b89870d6a0037b8fea7cf85903161",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "question": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "multiple_choice",
+                                            "true_false",
+                                            "descriptive"
+                                        ]
+                                    },
+                                    "options": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "correct_answer": {
+                                        "type": "string"
+                                    },
+                                    "score": {
+                                        "type": "integer"
+                                    },
+                                    "difficulty": {
+                                        "type": "string",
+                                        "enum": [
+                                            "easy",
+                                            "medium",
+                                            "hard"
+                                        ]
+                                    },
+                                    "category": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Question updated successfully"
+                    },
+                    "404": {
+                        "description": "Question not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Delete a question",
+                "operationId": "a014f1545d454af0fa437098dab714ae",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Question deleted successfully"
+                    },
+                    "404": {
+                        "description": "Question not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/support-tickets/{ticket}/messages": {
+            "get": {
+                "tags": [
+                    "Support Messages"
+                ],
+                "summary": "Get messages for a ticket",
+                "operationId": "ba8681befa5e6014114e16b77104bbee",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of messages"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Support Messages"
+                ],
+                "summary": "Add a message (reply) to a ticket",
+                "operationId": "92af69d2bc42307d01e03d859edbcac4",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "message"
+                                ],
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Here is more info..."
+                                    },
+                                    "attachments": {
+                                        "description": "List of file paths/URLs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Message added successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/support-tickets": {
+            "get": {
+                "tags": [
+                    "Support Tickets"
+                ],
+                "summary": "Get all support tickets",
+                "operationId": "2d6b7c48d61bcd3d110d3ff9c0269c5e",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "open",
+                                "in_progress",
+                                "waiting_for_user",
+                                "closed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "Filter by category",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "priority",
+                        "in": "query",
+                        "description": "Filter by priority",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "low",
+                                "medium",
+                                "high",
+                                "urgent"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of support tickets"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Support Tickets"
+                ],
+                "summary": "Create a new support ticket",
+                "operationId": "f957339d66548bd2321bb050937edbe9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "subject",
+                                    "category",
+                                    "priority"
+                                ],
+                                "properties": {
+                                    "subject": {
+                                        "type": "string",
+                                        "example": "Issue with payment"
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "financial"
+                                    },
+                                    "priority": {
+                                        "type": "string",
+                                        "enum": [
+                                            "low",
+                                            "medium",
+                                            "high",
+                                            "urgent"
+                                        ],
+                                        "example": "medium"
+                                    },
+                                    "message": {
+                                        "description": "Initial message",
+                                        "type": "string",
+                                        "example": "I cannot process my payment..."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Ticket created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/support-tickets/{ticket}": {
+            "get": {
+                "tags": [
+                    "Support Tickets"
+                ],
+                "summary": "Get ticket details",
+                "operationId": "54e1d011e778a421bd593ef04ebc3606",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ticket details"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Support Tickets"
+                ],
+                "summary": "Update ticket status/priority",
+                "operationId": "85216db0c956c8cbd2f204523e1cf8a5",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "open",
+                                            "in_progress",
+                                            "waiting_for_user",
+                                            "closed"
+                                        ]
+                                    },
+                                    "priority": {
+                                        "type": "string",
+                                        "enum": [
+                                            "low",
+                                            "medium",
+                                            "high",
+                                            "urgent"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Ticket updated successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Exam": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Math Exam"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Basic math questions"
+                    },
+                    "duration": {
+                        "type": "integer",
+                        "example": 60
+                    },
+                    "passing_score": {
+                        "type": "integer",
+                        "example": 70
+                    },
+                    "company_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "draft",
+                            "archived"
+                        ],
+                        "example": "draft"
+                    },
+                    "created_by": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Question"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "Question": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "exam_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "order": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "question": {
+                        "type": "string",
+                        "example": "What is 2+2?"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "multiple_choice",
+                            "true_false",
+                            "descriptive"
+                        ],
+                        "example": "multiple_choice"
+                    },
+                    "options": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "3",
+                            "4",
+                            "5"
+                        ]
+                    },
+                    "correct_answer": {
+                        "type": "string",
+                        "example": "4"
+                    },
+                    "score": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "difficulty": {
+                        "type": "string",
+                        "enum": [
+                            "easy",
+                            "medium",
+                            "hard"
+                        ],
+                        "example": "easy"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "Math"
+                    },
+                    "created_by": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Assessments",
+            "description": "API Endpoints for managing assessments"
+        },
+        {
+            "name": "Assessment Questions",
+            "description": "API Endpoints for managing assessment questions"
+        },
+        {
+            "name": "Assessment Steps",
+            "description": "API Endpoints for managing assessment steps"
+        },
+        {
+            "name": "Assessment Templates",
+            "description": "API Endpoints for managing assessment templates"
+        },
+        {
+            "name": "Companies",
+            "description": "API Endpoints for managing companies"
+        },
+        {
+            "name": "Exams",
+            "description": "API Endpoints for managing exams"
+        },
+        {
+            "name": "Exam Assignments",
+            "description": "API Endpoints for managing exam assignments to managers"
+        },
+        {
+            "name": "Exam Results",
+            "description": "API Endpoints for managing exam results"
+        },
+        {
+            "name": "Exam Sets",
+            "description": "API Endpoints for managing exam sets"
+        },
+        {
+            "name": "Managers",
+            "description": "API Endpoints for managing company managers"
+        },
+        {
+            "name": "Notifications",
+            "description": "API Endpoints for managing notifications"
+        },
+        {
+            "name": "Questions",
+            "description": "API Endpoints for managing questions"
+        },
+        {
+            "name": "Support Messages",
+            "description": "API Endpoints for managing support ticket messages"
+        },
+        {
+            "name": "Support Tickets",
+            "description": "API Endpoints for managing support tickets"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        }
+    ]
+}

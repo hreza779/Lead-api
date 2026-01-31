@@ -1,0 +1,18 @@
+name: My Arvan Config
+version: 0.0.1
+schema: v1
+
+models:
+  - name: Arvan Llama 70B          # هر نامی که دوست داری
+    provider: openai
+    model: meta-llama-3-70b-instruct  # ← اسم دقیق مدل از پنل آروان (مثل meta-llama-3-70b-instruct یا هر چی پنل نشون می‌ده)
+    apiBase: https://xxxxxx.aiaas.arvancloud.ir/v1   # ← Base URL دقیق از پنل آروان (حتماً /v1 داشته باشه)
+    apiKey: sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX   # ← API Key از پنل
+
+  # اختیاری: مدل جدا برای autocomplete (بهتره سبک‌تر باشه، اگر داری)
+  - name: Arvan Fast Model
+    provider: openai
+    model: meta-llama-3-8b-instruct
+    apiBase: https://xxxxxx.aiaas.arvancloud.ir/v1
+    apiKey: sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
