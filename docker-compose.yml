@@ -2,85 +2,53 @@ version: "3.8"
 
 services:
   # PHP-FPM Application
-  app:
+  lead_app:
     build:
       context: .
       dockerfile: Dockerfile
-      target: production  # تغییر به پروداکشن
+      target: production
     image: lead_app_image
     container_name: lead_app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
-      # فقط پوشه‌هایی که تغییر می‌کنند را مانت می‌کنیم
       - ./storage:/var/www/html/storage
-      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/custom.ini
     networks:
-      - lead_network
+      - financial_network # اتصال به شبکه پروژه قبلی
     depends_on:
-      - mysql
-      - redis
-    environment:
-      APP_ENV: production
-      APP_DEBUG: 'false'
+      - lead_mysql
 
-  # Nginx (Internal Web Server)
-  # این وب‌سرور داخلی است که فایل‌های استاتیک و PHP را مدیریت می‌کند
-  nginx:
+  # Nginx (Internal for Lead Project)
+  lead_nginx:
     image: nginx:alpine
     container_name: lead_nginx
     restart: unless-stopped
-    ports:
-      - "8000:80" # این پورت را در Nginx اصلی سرور صدا می‌زنیم
     volumes:
-      # در اینجا نیاز داریم فایل‌های پابلیک را به انجین‌اکس بدهیم
-      # اما چون کدها در والیوم نیستند، از volumes_from یا کپی استفاده میکنیم.
-      # ساده‌ترین راه: مانت کردن public اگر بیلد استاتیک ندارید،
-      # یا بهتر: استفاده از والیوم اشتراکی بین app و nginx.
-      # در اینجا برای سادگی، فرض میکنیم کانتینر app فایل‌ها را دارد.
-      # راه حل صحیح داکر برای پروداکشن:
-      - ./public:/var/www/html/public # فقط پوشه پابلیک برای دسترسی به استتیک‌ها
+      - ./public:/var/www/html/public
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     networks:
-      - lead_network
+      - financial_network
     depends_on:
-      - app
+      - lead_app
 
   # MySQL Database
-  mysql:
+  lead_mysql:
     image: mysql:8.0
     container_name: lead_mysql
     restart: unless-stopped
-    # پورت‌ها را حذف کردیم تا از بیرون سرور قابل دسترسی نباشد (امنیت)
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-lead}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
-      MYSQL_USER: ${DB_USERNAME:-lead}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
     volumes:
-      - mysql_data:/var/lib/mysql
+      - lead_mysql_data:/var/lib/mysql
     networks:
-      - lead_network
-    command: --default-authentication-plugin=mysql_native_password
-
-  # Redis Cache & Queue
-  redis:
-    image: redis:alpine
-    container_name: lead_redis
-    restart: unless-stopped
-    # پورت‌ها را حذف کردیم (امنیت)
-    volumes:
-      - redis_data:/data
-    networks:
-      - lead_network
-    command: redis-server --appendonly yes
+      - financial_network
 
 networks:
-  lead_network:
-    driver: bridge
+  financial_network:
+    external:
+      name: financial_default # استفاده از شبکه موجود در عکس شما
 
 volumes:
-  mysql_data:
-    driver: local
-  redis_data:
+  lead_mysql_data:
     driver: local
