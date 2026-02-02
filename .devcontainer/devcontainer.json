@@ -1,16 +1,9 @@
 {
-  "name": "Laravel API Dev",
-  "image": "mcr.microsoft.com/devcontainers/php:8.2",
-  "features": {
-    "ghcr.io/devcontainers/features/composer:1": {},
-    "ghcr.io/devcontainers/features/node:1": {}
+  "name": "Laravel API",
+  "build": {
+    "dockerfile": "Dockerfile"
   },
-  "postCreateCommand": "cp .env.example .env && php artisan key:generate && composer install",
   "forwardPorts": [8000],
-  "portsAttributes": {
-    "8000": {
-      "label": "Laravel API",
-      "onAutoForward": "openBrowser"
-    }
-  }
+  "postCreateCommand": "composer install",
+  "remoteUser": "vscode"
 }
