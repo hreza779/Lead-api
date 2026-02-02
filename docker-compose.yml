@@ -1,12 +1,11 @@
 version: "3.8"
 
 services:
-  # PHP-FPM Application
+  # کانتینر اپلیکیشن لاراول
   lead_app:
     build:
       context: .
       dockerfile: Dockerfile
-      target: production
     image: lead_app_image
     container_name: lead_app
     restart: unless-stopped
@@ -17,8 +16,9 @@ services:
       - financial_network # اتصال به شبکه پروژه قبلی
     depends_on:
       - lead_mysql
+      - lead_redis
 
-  # Nginx (Internal for Lead Project)
+  # انجین‌اکس داخلی پروژه جدید
   lead_nginx:
     image: nginx:alpine
     container_name: lead_nginx
@@ -28,27 +28,31 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     networks:
       - financial_network
-    depends_on:
-      - lead_app
 
-  # MySQL Database
+  # دیتابیس اختصاصی پروژه جدید
   lead_mysql:
     image: mysql:8.0
     container_name: lead_mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-lead}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_DATABASE: lead_db
+      MYSQL_ROOT_PASSWORD: root_password
     volumes:
       - lead_mysql_data:/var/lib/mysql
+    networks:
+      - financial_network
+
+  # ردیس اختصاصی پروژه جدید
+  lead_redis:
+    image: redis:alpine
+    container_name: lead_redis
     networks:
       - financial_network
 
 networks:
   financial_network:
     external:
-      name: financial_default # استفاده از شبکه موجود در عکس شما
+      name: financial_default # استفاده از شبکه موجود شما
 
 volumes:
   lead_mysql_data:
-    driver: local
